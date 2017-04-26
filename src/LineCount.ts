@@ -341,6 +341,9 @@ export default class LineCount {
         if (this.outtype.md) {
             this.out_md(total);
         }
+        if (this.outtype.html) {
+            this.out_html(total);
+        }
     }
 
     private out_txt(total: any) {
@@ -679,6 +682,92 @@ export default class LineCount {
         //do not show file, but preview the markdown
         let uri = vscode.Uri.parse('file:///' + filename);
         let success = vscode.commands.executeCommand("markdown.showPreviewToSide", uri);
+    }
+
+
+    /**
+     * 
+     * @param items 
+     */
+    private html_line_format(items: any[]) {
+        var data = "<p>" + items.join(" - ") + "</p>" + this.eol;
+        return data;
+    }
+
+    /**
+     * translate items list into a Markdown table format
+     * Markdown table format: | data1 | data2 |
+     * sperate by split(|) 
+     * @param items 
+     */
+    private html_table_format(items: any[]) {
+        var data = "";
+        for (var i = 0; i < items.length; i++) {
+            items[i] = "<td>" + items[i] + "</td>";
+        };
+        data = items.join(this.eol);
+        data = '<tr>' + data + '</tr>' + this.eol;
+        return data;
+    }
+
+    /**
+     * for html output
+     * @param total 
+     */
+    private out_html(total: any) {
+        let filename = path.join(this.outpath, this.EXTENSION_NAME + '.html');
+        console.log(filename);
+
+        // if (!fs.existsSync(filename)) {
+        //     let fd = fs.openSync(filename, 'w');
+        //     //fs.closeSync(fd);
+        // }
+        //let template = fs.readFile("template.html", err => { });
+        // let template = '<p>$$ </p> <p>$$</p> <table border="1">$$</table>';
+        // let test=template.split("$$");
+
+        //prepare data
+        var table = [];
+        var header = [];
+        header.push(this.html_line_format(["EXTENSION NAME", this.EXTENSION_NAME]));
+        header.push(this.html_line_format(["EXTENSION VERSION", this.EXTENSION_VERSION]));
+
+        header.push(this.html_line_format(["count time", util.getDateTime()]));
+        header.push(this.html_line_format(["count workspace", vscode.workspace.rootPath]));
+        header.push(this.html_line_format(["total files", this.filelist.length.toString()]));
+        header.push(this.html_line_format(["total code lines", total['code']]));
+        header.push(this.html_line_format(["total comment lines", total['comment']]));
+        header.push(this.html_line_format(["total blank lines", total['blank']]));
+        header.push(this.eol);
+
+        //must add a table header line in md
+
+        table.push('<table border="1">');
+        var items = [];
+        items = ['filename', 'code', 'comment', 'blank'];
+        table.push(this.html_table_format(items));
+
+        for (var key in this.filelist) {
+            if (this.filelist.hasOwnProperty(key)) {
+                var obj = this.filelist[key];
+                if (obj['isbinaryfile']) {
+                    items = [obj['filename'], "binary file"];
+                    table.push(this.html_table_format(items));
+                } else {
+                    items = [obj['filename'], obj['code'], obj['comment'], obj['blank']];
+                    table.push(this.html_table_format(items));
+                }
+            }
+        }
+        table.push("</table>");
+        table.push(this.eol);
+
+        let data = header.concat(table);
+        this.write_file(filename, data);
+
+        //do not show file, but preview the markdown
+        let uri = vscode.Uri.parse('file:///' + filename);
+        let success = vscode.commands.executeCommand("vscode.previewHtml", uri);
     }
 
     dispose() {  //实现dispose方法
