@@ -19,7 +19,7 @@ The LineCount extension for Visual Studio Code counts and displays the lines of 
 
 * Support languages: c,cpp,java,js,ts,cs(`//,/*,*/`),sql(`--,/*,*/`),pas(`//,{*,*}`),perl(`#,=pod,=cut`),ruby(`#,=begin,=end`),python(`#,'''`),vb(`'`),html(`<!--,-->`),bat(`::`),sh(`#`),ini(`;`),fortran(`!`),m(`%`).
 
-* You can customize the comment symbol.
+* You can customize the comment symbol, add new languages support.
 
 * Line number information can be output to JSON, TXT, CSV, Markdown file.
 
@@ -45,7 +45,11 @@ code .
 * `LineCount.excludes`: (string array|default `"**/.vscode/**,**/node_modules/**"`) files and folders that you want exclude them.
 * `LineCount.output.txt`: (boolean | default `true`) Whether output to TXT file.
 * `LineCount.output.json`: (boolean | default `true`) Whether output to JSON file.
+* `LineCount.output.csv`: (boolean | default `false`) Whether output to CSV file.
+* `LineCount.output.md`: (boolean | default `false`) Whether output to markdown file and preview.
 * `LineCount.output.outdir`: (string | default `out`) output file path.
+* `LineCount.sort`: (string enum | default `filename`) Specifies the sort field.
+* `LineCount.order`: (string enum | default `asc`) Specify ascending or descending order.
 * `LineCount.comment.ext`: (string array| required) file extension. if it`s "*", the rule for other files. default c style.
 * `LineCount.comment.separator.linecomment`: (string |default none) Single line comment symbol.
 * `LineCount.comment.separator.linetol`: (boolean |default `false`) Whether the line comment must be started on the line.
@@ -77,6 +81,9 @@ code .
                         "md": true,       
                         "outdir":"out"      
                         },
+    "LineCount.sort": "filename",
+
+    "LineCount.order": "asc",
 
     "LineCount.comment":[
                         {
